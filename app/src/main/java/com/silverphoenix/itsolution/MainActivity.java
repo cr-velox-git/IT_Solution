@@ -1,24 +1,23 @@
 package com.silverphoenix.itsolution;
 
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-
 import android.content.Context;
 import android.content.Intent;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
-import android.view.View;
 import android.widget.Button;
-import android.widget.LinearLayout;
 import android.widget.Toast;
+
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonArrayRequest;
+import com.android.volley.toolbox.JsonObjectRequest;
 import com.silverphoenix.itsolution.Category.CategoryAdapter;
 import com.silverphoenix.itsolution.Category.CategoryData;
 import com.silverphoenix.itsolution.Category.CategoryRoomDB;
@@ -75,37 +74,31 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    private void fetchData(){
+    private void fetchData() {
         categoryDatabase.categoryDao().reset(categoryDataList);
         categoryDataList.clear();
 
         String url = "https://www.snedamart.com/app/api/category.php";
-        JsonArrayRequest jsonArrayRequest = new JsonArrayRequest(Request.Method.GET, url, null, new Response.Listener<JSONArray>() {
+        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.GET, url, null, new Response.Listener<JSONObject>() {
             @Override
-            public void onResponse(JSONArray response) {
-                for (int i = 0;i<response.length();i++){
-                    try {
-                        JSONObject jsonObject = response.getJSONObject(i);
-                        String status = jsonObject.getString("StatusMessage");
-                        Toast.makeText(MainActivity.this, status, Toast.LENGTH_SHORT).show();
-                        JSONObject category = jsonObject.getJSONObject("Category");
+            public void onResponse(JSONObject response) {
+                try {
+                    String status = response.getString("StatusMessage");
+                    JSONArray categoryArray = response.getJSONArray("Category");
 
-                        for (int j =0; j<category.length();j++){
-                            String id = category.getString("Id");
-                            String name = category.getString("Name");
-                            String image = category.getString("Image");
+                    for (int i = 0; i < categoryArray.length(); i++) {
+                        JSONObject categoryItem = categoryArray.getJSONObject(i);
+                        String id = categoryItem.getString("Id");
+                        String name = categoryItem.getString("Name");
+                        String image = categoryItem.getString("Image");
 
-                            CategoryData data = new CategoryData();
-                            data.setID(Integer.parseInt(id));
-                            data.setImage(image);
-                            data.setName(name);
-                        }
-
-
-
-                    } catch (JSONException e) {
-                        e.printStackTrace();
+                        CategoryData data = new CategoryData();
+                        data.setID(Integer.parseInt(id));
+                        data.setImage(image);
+                        data.setName(name);
                     }
+                } catch (JSONException e) {
+                    e.printStackTrace();
                 }
                 categoryDataList.addAll(categoryDatabase.categoryDao().getAll());
 
@@ -121,6 +114,48 @@ public class MainActivity extends AppCompatActivity {
                 Toast.makeText(MainActivity.this, error.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });
-        requestQueue.add(jsonArrayRequest);
+
+//        JsonArrayRequest jsonArrayRequest = new JsonArrayRequest(Request.Method.GET, url, null, new Response.Listener<JSONArray>() {
+//            @Override
+//            public void onResponse(JSONArray response) {
+//                for (int i = 0; i < response.length(); i++) {
+//                    try {
+//                        JSONObject jsonObject = response.getJSONObject(i);
+//                        String status = jsonObject.getString("StatusMessage");
+//                        Toast.makeText(MainActivity.this, status, Toast.LENGTH_SHORT).show();
+//                        JSONObject category = jsonObject.getJSONObject("Category");
+//
+//                        for (int j =0; j<category.length();j++){
+//                            String id = category.getString("Id");
+//                            String name = category.getString("Name");
+//                            String image = category.getString("Image");
+//
+//                            CategoryData data = new CategoryData();
+//                            data.setID(Integer.parseInt(id));
+//                            data.setImage(image);
+//                            data.setName(name);
+//                        }
+//
+//
+//
+//                    } catch (JSONException e) {
+//                        e.printStackTrace();
+//                    }
+//                }
+//                categoryDataList.addAll(categoryDatabase.categoryDao().getAll());
+//
+//                categoryAdapter = new CategoryAdapter(categoryDataList, MainActivity.this);
+//                recyclerView.setAdapter(categoryAdapter);
+//                categoryAdapter.notifyDataSetChanged();
+//                Toast.makeText(MainActivity.this, "data fetched", Toast.LENGTH_SHORT).show();
+//            }
+//        }, new Response.ErrorListener() {
+//            @Override
+//            public void onErrorResponse(VolleyError error) {
+//                Toast.makeText(MainActivity.this, "error", Toast.LENGTH_SHORT).show();
+//                Toast.makeText(MainActivity.this, error.getMessage(), Toast.LENGTH_SHORT).show();
+//            }
+//        });
+        requestQueue.add(jsonObjectRequest);
     }
 }

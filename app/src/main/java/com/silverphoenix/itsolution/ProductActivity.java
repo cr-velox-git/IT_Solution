@@ -16,6 +16,9 @@ import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonArrayRequest;
+import com.android.volley.toolbox.JsonObjectRequest;
+import com.silverphoenix.itsolution.Category.CategoryAdapter;
+import com.silverphoenix.itsolution.Category.CategoryData;
 import com.silverphoenix.itsolution.Product.ProductAdapter;
 import com.silverphoenix.itsolution.Product.ProductData;
 import com.silverphoenix.itsolution.Product.ProductRoomDB;
@@ -67,24 +70,37 @@ public class ProductActivity extends AppCompatActivity {
         productDataList.clear();
 
         String url = "https://snedamart.com/app/api/item.php?catid=11&subid=12";
-        JsonArrayRequest jsonArrayRequest = new JsonArrayRequest(Request.Method.GET, url, null, new Response.Listener<JSONArray>() {
+
+        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.GET, url, null, new Response.Listener<JSONObject>() {
             @Override
-            public void onResponse(JSONArray response) {
-                for (int i = 0;i<response.length();i++){
-                    try {
-                        JSONObject jsonObject = response.getJSONObject(i);
-                        String id = jsonObject.getString("Id");
-                        String name = jsonObject.getString("Name");
-                        String image = jsonObject.getString("Image");
+            public void onResponse(JSONObject response) {
+                try {
+                    String status = response.getString("StatusMessage");
+                    JSONArray productArray = response.getJSONArray("ItemList");
+
+                    for (int i = 0; i < productArray.length(); i++) {
+                        JSONObject productItem = productArray.getJSONObject(i);
+                        String id = productItem.getString("Id");
+                        String name = productItem.getString("Name");
+                        String image = productItem.getString("Image");
+                        String image1 = productItem.getString("Image1");
+                        String image2 = productItem.getString("Image2");
+                        String mrp = productItem.getString("Mrp");
+                        String dis = productItem.getString("Discount");
+                        String sale = productItem.getString("Salerate");
 
                         ProductData data = new ProductData();
                         data.setID(Integer.parseInt(id));
                         data.setImage(image);
                         data.setName(name);
-
-                    } catch (JSONException e) {
-                        e.printStackTrace();
+                        data.setImage1(image1);
+                        data.setImage2(image2);
+                        data.setMrp(mrp);
+                        data.setDiscount(dis);
+                        data.setSellprice(sale);
                     }
+                } catch (JSONException e) {
+                    e.printStackTrace();
                 }
                 productDataList.addAll(productDatabase.productDao().getAll());
 
@@ -96,9 +112,10 @@ public class ProductActivity extends AppCompatActivity {
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
+                Toast.makeText(ProductActivity.this, "error", Toast.LENGTH_SHORT).show();
                 Toast.makeText(ProductActivity.this, error.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });
-        requestQueue.add(jsonArrayRequest);
+        requestQueue.add(jsonObjectRequest);
     }
 }
