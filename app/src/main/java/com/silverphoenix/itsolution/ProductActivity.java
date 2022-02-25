@@ -98,11 +98,12 @@ public class ProductActivity extends AppCompatActivity {
                         data.setMrp(mrp);
                         data.setDiscount(dis);
                         data.setSellprice(sale);
+                        productDataList.add(i,data);
                     }
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
-                productDataList.addAll(productDatabase.productDao().getAll());
+
 
                 productAdapter = new ProductAdapter(productDataList, ProductActivity.this);
                 recyclerView.setAdapter(productAdapter);

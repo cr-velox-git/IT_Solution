@@ -9,7 +9,10 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
+
+import com.bumptech.glide.Glide;
 import com.silverphoenix.itsolution.R;
+import com.silverphoenix.itsolution.Utils;
 
 import java.util.List;
 
@@ -36,8 +39,7 @@ public class CategoryAdapter extends RecyclerView.Adapter<CategoryAdapter.Viewho
     public void onBindViewHolder(@NonNull CategoryAdapter.Viewholder holder, int position) {
         //Initialize data
         CategoryData categoryData = categoryDataList.get(position);
-        categoryRoomDB = categoryRoomDB.getInstance(context);
-
+        categoryRoomDB = CategoryRoomDB.getInstance(context);
         holder.setData(categoryData);
     }
 
@@ -59,6 +61,8 @@ public class CategoryAdapter extends RecyclerView.Adapter<CategoryAdapter.Viewho
         }
 
         public void setData(CategoryData categoryData) {
+            Glide.with(context).load(categoryData.getImage()).into(c_image);
+
             c_name.setText(categoryData.getName());
         }
     }

@@ -10,6 +10,7 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.bumptech.glide.Glide;
 import com.silverphoenix.itsolution.R;
 
 import java.util.List;
@@ -64,11 +65,12 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.Viewhold
         }
 
         private void setData(ProductData productData) {
+            Glide.with(context).load(productData.getImage()).into(p_image);
             //p_image = i
             p_name.setText(productData.getName());
-            p_mrp.setText(productData.getMrp());
+            p_mrp.setText("MRP: Rs."+productData.getMrp());
             p_discount.setText(productData.getDiscount());
-            p_sell.setText(productData.getSellprice());
+            p_sell.setText("Rs. "+productData.getSellprice());
         }
     }
 }

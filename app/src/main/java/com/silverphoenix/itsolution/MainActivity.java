@@ -1,5 +1,6 @@
 package com.silverphoenix.itsolution;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.net.ConnectivityManager;
@@ -80,12 +81,13 @@ public class MainActivity extends AppCompatActivity {
 
         String url = "https://www.snedamart.com/app/api/category.php";
         JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.GET, url, null, new Response.Listener<JSONObject>() {
+            @SuppressLint("NotifyDataSetChanged")
             @Override
             public void onResponse(JSONObject response) {
                 try {
                     String status = response.getString("StatusMessage");
                     JSONArray categoryArray = response.getJSONArray("Category");
-
+                    Toast.makeText(MainActivity.this, status, Toast.LENGTH_SHORT).show();
                     for (int i = 0; i < categoryArray.length(); i++) {
                         JSONObject categoryItem = categoryArray.getJSONObject(i);
                         String id = categoryItem.getString("Id");
@@ -93,14 +95,15 @@ public class MainActivity extends AppCompatActivity {
                         String image = categoryItem.getString("Image");
 
                         CategoryData data = new CategoryData();
-                        data.setID(Integer.parseInt(id));
+
                         data.setImage(image);
                         data.setName(name);
+                        categoryDataList.add(i,data);
                     }
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
-                categoryDataList.addAll(categoryDatabase.categoryDao().getAll());
+
 
                 categoryAdapter = new CategoryAdapter(categoryDataList, MainActivity.this);
                 recyclerView.setAdapter(categoryAdapter);
