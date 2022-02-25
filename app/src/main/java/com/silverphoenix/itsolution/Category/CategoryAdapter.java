@@ -61,8 +61,8 @@ public class CategoryAdapter extends RecyclerView.Adapter<CategoryAdapter.Viewho
         }
 
         public void setData(CategoryData categoryData) {
-            Glide.with(context).load(categoryData.getImage()).into(c_image);
-
+            String i = categoryData.getImage();
+            Glide.with(context).load(i).into(c_image);
             c_name.setText(categoryData.getName());
         }
     }
